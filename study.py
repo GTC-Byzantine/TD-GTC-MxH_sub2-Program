@@ -28,8 +28,10 @@ def get_response():
     try:
         completion = client.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[{'role': 'system', 'content': 'You are a helpful assistant.'},
-                      {'role': 'user', 'content': "请你作为一个高中数学老师以简短的话语解答这个问题(与数学无关的问题不回答,回答输出文字,禁止使用md格式):" + question}]
+            messages=[
+                {'role': 'system', 'content': 'You are a helpful assistant.'},
+                {'role': 'user', 'content': f"请你作为一个高中数学老师以简短的话语解答这个问题(与数学无关的问题不回答,回答输出文字,使用md格式):{question}"}
+            ]
         )
         response = completion.choices[0].message.content  # 获取回答内容
         render_markdown(response)  # 渲染Markdown内容
@@ -55,15 +57,13 @@ def render_markdown(markdown):
             response_text.insert(tk.END, latex_content + "\n", "latex")
         
         # 去除Markdown格式标识
-        line = re.sub(r'^# ', '', line)
-        line = re.sub(r'^## ', '', line)
+        line = re.sub(r'^# ', '', line)  # 标题一级
+        line = re.sub(r'^## ', '', line)  # 标题二级
         line = re.sub(r'^\* ', '', line)
         line = re.sub(r'^- ', '', line)
         line = re.sub(r'^> ', '', line)
-        line = re.sub(r'^\*\*', '', line)
-        line = re.sub(r'\*\*$', '', line)
-        line = re.sub(r'^\*', '', line)
-        line = re.sub(r'\*$', '', line)
+        line = re.sub(r'\*\*(.*?)\*\*', r'\1', line)  # 双星号加粗
+        line = re.sub(r'\*(.*?)\*', r'\1', line)  # 单星号斜体
         
         # 插入处理后的文本
         if line.strip():
@@ -116,3 +116,4 @@ button.config(relief=tk.RAISED, bd=10)
 
 # 运行主循环
 root.mainloop()
+
