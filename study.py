@@ -1,13 +1,14 @@
 import tkinter as tk
 from tkinter import font as tkfont
-from openai import OpenAI
+from tkinter import ttk
 import re
 import time
+from openai import OpenAI
 
-# 初始化OpenAI客户端(中转的限速开发中,先提供源码)
+# 初始化OpenAI客户端
 client = OpenAI(
     api_key="",  # 替换为实际API Key
-    base_url="" #API请求地址
+    base_url=""  # API请求地址
 )
 
 last_request_time = 0
@@ -40,6 +41,7 @@ def get_response():
 
 def render_markdown(markdown):
     # 清空现有内容
+    response_text.config(state=tk.NORMAL)
     response_text.delete("1.0", tk.END)
     
     # 加载自定义字体
@@ -78,6 +80,9 @@ def render_markdown(markdown):
     response_text.tag_config("quote", font=tkfont.Font(family="SimSun", size=14, weight="bold"), foreground="green")
     response_text.tag_config("bold", font=tkfont.Font(family="SimSun", size=14, weight="bold"))
     response_text.tag_config("italic", font=tkfont.Font(family="SimSun", size=14, slant="italic"))
+    
+    # 重新设置为只读状态
+    response_text.config(state=tk.DISABLED)
 
 # 创建主窗口
 root = tk.Tk()
@@ -93,6 +98,7 @@ text_input.pack(pady=20, padx=20)
 def update_word_count(*args):
     word_count = len(text_input.get("1.0", "end-1c"))
     word_count_label.config(text=f"字数: {word_count}/30")
+    enable_button(word_count >= 5)
 
 text_input.bind("<KeyRelease>", update_word_count)
 
@@ -104,16 +110,27 @@ word_count_label.pack(pady=10, padx=20)
 button_frame = tk.Frame(root, bg="#F0F0F0")
 button_frame.pack(pady=10, padx=20, side=tk.RIGHT)
 
-button = tk.Button(button_frame, text="提问", command=get_response, font=("SimSun", 14, "bold"), bg="#4CAF50", fg="white", relief=tk.RAISED, bd=10)
+# 创建样式
+style = ttk.Style()
+style.configure('Custom.TButton', font=('SimSun', 14, 'bold'), background='#4CAF50', foreground='white')
+
+# 创建按钮
+button = ttk.Button(button_frame, text="提问", command=get_response, style='Custom.TButton', state=tk.DISABLED)
 button.pack(pady=10, padx=20)
 
-# 创建输出框
-response_text = tk.Text(root, height=20, width=120, font=("SimSun", 14, "bold"), spacing1=5, spacing3=5)
+# 创建输出框并设置为只读
+response_text = tk.Text(root, height=20, width=120, font=("SimSun", 14, "bold"), spacing1=5, spacing3=5, state=tk.DISABLED)
 response_text.pack(pady=20, padx=20)
 
-# 应用大圆角样式
-button.config(relief=tk.RAISED, bd=10)
+# 控制按钮状态
+def enable_button(enable):
+    if enable:
+        button.config(state=tk.NORMAL)
+    else:
+        button.config(state=tk.DISABLED)
+
+# 初始状态禁用按钮
+enable_button(False)
 
 # 运行主循环
 root.mainloop()
-
