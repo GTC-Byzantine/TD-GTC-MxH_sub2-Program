@@ -1,5 +1,5 @@
 import sys
-
+from typing import Tuple, List
 import pygame
 
 pygame.init()
@@ -8,8 +8,8 @@ pygame.init()
 class ProgressBar:
     process = 0
 
-    def __init__(self, width: int, height: int, target: pygame.Surface, pos: list[int],
-                 color: tuple[tuple[int, int, int], tuple[int, int, int]] = ([0, 0, 0], [0, 255, 0]), sep: int = 5,
+    def __init__(self, width: int, height: int, target: pygame.Surface, pos: List[int],
+                 color: Tuple[Tuple[int, int, int], Tuple[int, int, int]] = ([0, 0, 0], [0, 255, 0]), sep: int = 5,
                  border=None):
         self.surface = pygame.Surface((width, height))
         self.background_color = color[0]

@@ -26,6 +26,7 @@ class SimpleButtonWithImage:
         self.text_ini = text
         self.text_size = None
         self.text_color = None
+        self.text_pos = [text[1][0] + pos[0], text[1][1] + pos[1]]
         if text is not None:
             self.text_size = text[2]
             self.text_color = text[3]
@@ -41,6 +42,7 @@ class SimpleButtonWithImage:
         return False
 
     def operate(self, mouse_pos: Tuple[int, int], effectiveness: bool or Literal[0, 1]):
+
         if self._in_area(mouse_pos):
             if effectiveness and not self.lock:
                 self.state = True
@@ -51,29 +53,36 @@ class SimpleButtonWithImage:
             if self.lock and not effectiveness:
                 self.lock = False
 
-            if self.bg_image is not None:
-                self.surface.blit(self.bg_image, self.pos)
         else:
             pygame.draw.rect(self.surface, self.bg_color, [self.pos[0], self.pos[1], self.size[0], self.size[1]])
+
             if effectiveness:
                 self.lock = True
             else:
                 self.lock = False
+        if self.bg_image is not None:
+            self.surface.blit(self.bg_image, self.pos)
         pygame.draw.rect(self.surface, (0, 0, 0), [self.pos[0], self.pos[1], self.size[0], self.size[1]],
                          width=2)
+
         if self.text_ini is not None:
-            self.surface.blit(self.text, self.text.get_rect(center=self.pos))
+            self.surface.blit(self.text, self.text.get_rect(center=self.text_pos))
 
 
 if __name__ == "__main__":
+    pygame.init()
     sc = pygame.display.set_mode((500, 500))
-    button = SimpleButtonWithImage([100, 100], sc)
+    button = SimpleButtonWithImage([50, 100], sc, bg_image=pygame.image.load('../Data/Image/p1.png'),
+                                   text=['文件夹', (100, 150), 25, (0, 0, 0)], font='../ddjbt.ttf')
+    button1 = SimpleButtonWithImage([300, 100], sc, bg_image=pygame.image.load('../Data/Image/p5.png'),
+                                    text=['markdown', (100, 150), 25, (0, 0, 0)], font='../ddjbt.ttf')
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
         sc.fill((255, 255, 255))
         button.operate(pygame.mouse.get_pos(), pygame.mouse.get_pressed(3)[0])
+        button1.operate(pygame.mouse.get_pos(), pygame.mouse.get_pressed(3)[0])
         print(button.state)
 
         pygame.display.update()

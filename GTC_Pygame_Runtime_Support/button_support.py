@@ -1,31 +1,32 @@
 import sys
 import pygame
 import os
+from typing import List, Tuple
 
 pygame.init()
 
 
 class FeedbackButton:
     # 初始化反馈按钮
-    def __init__(self, size: list[int], pos: list[int], text: str, text_size: int,
+    def __init__(self, size: List[int], pos: List[int], text: str, text_size: int,
                  surface: pygame.Surface, bg_color=(30, 255, 189), border_color=(255, 255, 255),
-                 change_color: tuple[tuple[int, int, int], tuple[int, int, int]] = ((0, 112, 255), (0, 255, 112)),
-                 text_color: list[int] = (0, 0, 0), speed: int = 2, font_type: str='microsoftyahei'):
+                 change_color: Tuple[Tuple[int, int, int], Tuple[int, int, int]] = ((0, 112, 255), (0, 255, 112)),
+                 text_color: List[int] = (0, 0, 0), speed: int = 2, font_type: str = 'microsoftyahei'):
         self.size = size
         self.pos = pos
-        # 加载字体文件或使用系统默认字体
+
         if os.path.exists(font_type):
             self.text = pygame.font.Font(font_type, text_size).render(text, True, text_color)
         else:
             self.text = pygame.font.SysFont(font_type, text_size).render(text, True, text_color)
         self.color = [bg_color, border_color, change_color]
         self.font_rect = self.text.get_rect()
-        # 设置文本居中显示
+
         self.font_rect.center = (pos[0] + size[0] // 2, pos[1] + size[1] // 2)
         self.iter = 0
         self.color_iter = 0
         self.speed = speed
-        # 计算颜色变化的步长
+
         self.color_delta = [(self.color[2][0][0] - self.color[2][1][0]) / 4,
                             (self.color[2][0][1] - self.color[2][1][1]) / 4,
                             (self.color[2][0][2] - self.color[2][1][2]) / 4]
@@ -34,7 +35,6 @@ class FeedbackButton:
         self.state = False
         self.lock = False
 
-    # 检查鼠标位置是否在按钮区域内
     def in_area(self, mouse_pos):
         if self.pos[0] <= mouse_pos[0] <= self.size[0] + self.pos[0] and self.pos[1] <= mouse_pos[1] <= self.size[1] + \
                 self.pos[1]:
@@ -68,10 +68,10 @@ class FeedbackButton:
                 self.lock = False
 
         self.temp_color = list(self.color[2][0])
-        # 根据颜色迭代值调整颜色
+
         for item in range(len(self.temp_color)):
             self.temp_color[item] -= self.color_iter * self.color_delta[item]
-        # 绘制按钮背景
+
         pygame.draw.rect(self.surface, self.temp_color, (self.pos[0] - self.iter, self.pos[1] - self.iter,
                                                          self.size[0] + 2 * self.iter, self.size[1] + 2 * self.iter),
                          border_radius=min(self.size) // 4, width=6)
@@ -80,14 +80,11 @@ class FeedbackButton:
         pygame.draw.rect(self.surface, self.color[1], [self.pos[0], self.pos[1], self.size[0], self.size[1]],
                          border_radius=min(self.size) // 4, width=4)
 
-        # 显示文本
         self.surface.blit(self.text, self.font_rect)
 
-    # 更改按钮位置
-    def change_pos(self, pos: tuple[int, int]):
+    def change_pos(self, pos: Tuple[int, int]):
         self.pos = pos
-        self.font_rect.center = (pos[0] + self.size[0] // 2,
-                                 pos[1] + self.size[1] // 2)
+        self.font_rect.center = (pos[0] + self.size[0] // 2, pos[1] + self.size[1] // 2)
 
 
 class DelayButton:
@@ -169,7 +166,6 @@ class DelayButton:
 
         # 显示文本
         self.surface.blit(self.text, self.font_rect)
-
 
 # if __name__ == '__main__':
 #     screen = pygame.display.set_mode((500, 500))
